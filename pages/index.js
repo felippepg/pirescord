@@ -36,7 +36,7 @@ export default function PaginaInicial() {
           styleSheet={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: username.trim() ? 'space-between' : 'center',
             flexDirection: {
               xs: 'column',
               sm: 'row',
@@ -94,7 +94,8 @@ export default function PaginaInicial() {
 
 
           {/* Photo Area */}
-          <Box
+
+          {username.trim() && <Box
             styleSheet={{
               display: 'flex',
               flexDirection: 'column',
@@ -109,14 +110,14 @@ export default function PaginaInicial() {
               minHeight: '240px',
             }}
           >
-            {username.trim() && <Image
+            <Image
               alt='usuario'
               styleSheet={{
                 borderRadius: '50%',
                 marginBottom: '16px',
               }}
               src={`https://github.com/${username}.png`}
-            />}
+            />
             <Text
               variant="body4"
               styleSheet={{
@@ -128,7 +129,8 @@ export default function PaginaInicial() {
             >
               {username}
             </Text>
-          </Box>
+          </Box>}
+          
           {/* Photo Area */}
         </Box>
       </Box>
