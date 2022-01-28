@@ -1,7 +1,9 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React, { useEffect, useState } from 'react';
 import appConfig from '../config.json';
+import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js';
+import { ButtonSendSticker } from '../src/components/ButtonSendSticker';
 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MDg2OTA3MywiZXhwIjoxOTU2NDQ1MDczfQ.343ibq7UYFPDdyfsfGmEqUma01RW7P7KC9U2MDAGSkI';
 const SUPABASE_URL = 'https://kysxypdmtxjlkdysdlas.supabase.co';
@@ -10,6 +12,8 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 export default function ChatPage() {
   const [mensagem, setMensagem] = useState('')
   const [listaMensagens, setListaMensagens] = useState([])
+  const router = useRouter()
+  const usuarioLogado = router.query.username
 
   useEffect(function(){
     supabaseClient
@@ -24,7 +28,7 @@ export default function ChatPage() {
   // Sua lógica vai aqui
   const handleAddMessageToList = (message) => {
     const mensagem = {
-      de: 'felippepg',
+      de: usuarioLogado,
       texto: message
     }
 
@@ -48,7 +52,7 @@ export default function ChatPage() {
     <Box
       styleSheet={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        backgroundImage: `url(https://i.pinimg.com/originals/8a/ed/07/8aed075b2259a6f2bace5c4924ceb0a3.jpg)`,
+        backgroundImage: 'url(https://i.pinimg.com/originals/37/ef/b1/37efb13aebc8d4e3e3ada903f8847410.jpg)',
         backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
         color: appConfig.theme.colors.neutrals['000']
       }}
@@ -62,7 +66,7 @@ export default function ChatPage() {
           borderRadius: '5px',
           backgroundColor: appConfig.theme.colors.neutrals[700],
           height: '100%',
-          maxWidth: '95%',
+          maxWidth: '95vw',
           maxHeight: '95vh',
           padding: '32px',
         }}
@@ -113,6 +117,11 @@ export default function ChatPage() {
                 color: appConfig.theme.colors.neutrals[200],
               }}
             />
+
+            <ButtonSendSticker onStickerClick={function(sticker){
+              handleAddMessageToList(`:sticker:${sticker}`)
+            }}/>
+
             <Button
               onClick={function () {
                 handleAddMessageToList(mensagem)
@@ -120,7 +129,7 @@ export default function ChatPage() {
               label='Enviar'
               size="lg"
               buttonColors={{
-                contrastColor: appConfig.theme.colors.neutrals["000"],
+                contrastColor: appConfig.theme.colors.neutrals["999"],
                 mainColor: appConfig.theme.colors.primary[500],
                 mainColorLight: appConfig.theme.colors.primary[400],
                 mainColorStrong: appConfig.theme.colors.primary[600],
@@ -129,7 +138,8 @@ export default function ChatPage() {
                 resize: 'none',
                 padding: '6px 8px',
                 borderRadius: '5px',
-                height: '44px'
+                height: '48px',
+                marginLeft: '5px',
               }}
             >
               Enviar
@@ -226,7 +236,21 @@ function MessageList(props) {
                   {(new Date().toLocaleDateString())}
                 </Text>
               </Box>
-              {mensagem.texto}
+              {mensagem.texto.startsWith(':sticker:') ? 
+                (
+                  <Image 
+                    src={mensagem.texto.replace(':sticker:', '')} alt='Sticker'
+                    styleSheet={{
+                      maxWidth: '300px',
+                      maxHeight: '300px'
+                    }}
+                  /> 
+
+                ) :
+                (
+                  mensagem.texto
+                )   
+              }
             </Text>
             <Button
               iconName="removeFormat"
