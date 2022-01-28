@@ -21,14 +21,14 @@ function Titulo(props) {
 
 export default function PaginaInicial() {
   const [username, setUsername] = useState('')
-  const router  = useRouter()
+  const router = useRouter()
 
   return (
     <>
       <Box
         styleSheet={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          backgroundImage: 'url(https://i.pinimg.com/originals/8a/ed/07/8aed075b2259a6f2bace5c4924ceb0a3.jpg)',
+          backgroundImage: 'url(https://i.pinimg.com/originals/37/ef/b1/37efb13aebc8d4e3e3ada903f8847410.jpg)',
           backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
         }}
       >
@@ -50,7 +50,7 @@ export default function PaginaInicial() {
           {/* Formulário */}
           <Box
             as="form"
-            onSubmit={function(event) {
+            onSubmit={function (event) {
               event.preventDefault()
               router.push('/chat')
             }}
@@ -66,7 +66,7 @@ export default function PaginaInicial() {
 
             <TextField
               fullWidth
-              onChange={function(event) {
+              onChange={function (event) {
                 setUsername(event.target.value)
               }}
               textFieldColors={{
@@ -130,7 +130,7 @@ export default function PaginaInicial() {
               {username}
             </Text>
           </Box>}
-          
+
           {/* Photo Area */}
         </Box>
       </Box>
