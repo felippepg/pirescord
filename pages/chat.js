@@ -9,6 +9,15 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5v
 const SUPABASE_URL = 'https://kysxypdmtxjlkdysdlas.supabase.co';
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function getMessagesInRealTime(addMessage) {
+  return supabaseClient
+  .from('mensagens')
+  .on('INSERT', (messages) => {
+    addMessage(messages.new);
+  })
+  .subscribe();
+}
+
 export default function ChatPage() {
   const [mensagem, setMensagem] = useState('')
   const [listaMensagens, setListaMensagens] = useState([])
@@ -19,14 +28,24 @@ export default function ChatPage() {
     supabaseClient
       .from('mensagens')
       .select('*')
+      .limit(10)
       .order('id', { ascending: false })
       .then(({ data }) => {
         setListaMensagens(data)
       })
       
+      getMessagesInRealTime(function(novaMensagem) {
+        setListaMensagens(function(newValue) {
+          return [
+            novaMensagem, 
+            ...newValue
+          ]
+        })
+      })
   }, [])
+
   // Sua lógica vai aqui
-  const handleAddMessageToList = (message) => {
+  function handleAddMessageToList(message) {
     const mensagem = {
       de: usuarioLogado,
       texto: message
@@ -38,11 +57,6 @@ export default function ChatPage() {
         mensagem
       ])
       .then(({ data }) => {
-        console.log(data)
-        setListaMensagens([
-          data[0], 
-          ...listaMensagens
-        ])
       })
 
     setMensagem('')
@@ -64,7 +78,7 @@ export default function ChatPage() {
           flex: 1,
           boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
           borderRadius: '5px',
-          backgroundColor: appConfig.theme.colors.neutrals[700],
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
           height: '100%',
           maxWidth: '95vw',
           maxHeight: '95vh',
@@ -78,7 +92,7 @@ export default function ChatPage() {
             display: 'flex',
             flex: 1,
             height: '80%',
-            backgroundColor: appConfig.theme.colors.neutrals[600],
+            backgroundColor: 'transparent',
             flexDirection: 'column',
             borderRadius: '5px',
             padding: '16px',
@@ -95,7 +109,7 @@ export default function ChatPage() {
           >
             <TextField
               placeholder="Insira sua mensagem aqui..."
-              type="textarea"
+              type="textfield"
               value={mensagem}
               onChange={function (event) {
                 setMensagem(event.target.value)
@@ -108,13 +122,22 @@ export default function ChatPage() {
               }}
               styleSheet={{
                 width: '100%',
-                border: '0',
+                height: '50px',
                 resize: 'none',
                 borderRadius: '5px',
                 padding: '6px 8px',
                 backgroundColor: appConfig.theme.colors.neutrals[800],
                 marginRight: '12px',
                 color: appConfig.theme.colors.neutrals[200],
+              }}
+              textFieldColors={{
+                neutral: {
+                  textColor: appConfig.theme.colors.neutrals[200],
+                  mainColor: appConfig.theme.colors.neutrals[900],
+                  mainColorHighlight: appConfig.theme.colors.primary[500],
+                  borderColor: appConfig.theme.colors.primary[400],
+                  backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                },
               }}
             />
 
@@ -126,7 +149,7 @@ export default function ChatPage() {
               onClick={function () {
                 handleAddMessageToList(mensagem)
               }}
-              label='Enviar'
+              iconName="arrowRight"
               size="lg"
               buttonColors={{
                 contrastColor: appConfig.theme.colors.neutrals["999"],
@@ -135,11 +158,17 @@ export default function ChatPage() {
                 mainColorStrong: appConfig.theme.colors.primary[600],
               }}
               styleSheet={{
-                resize: 'none',
-                padding: '6px 8px',
-                borderRadius: '5px',
-                height: '48px',
                 marginLeft: '5px',
+                borderRadius: '50%',
+                padding: '0 3px 0 0',
+                minWidth: '50px',
+                minHeight: '50px',
+                fontSize: '20px',
+                marginBottom: '8px',
+                lineHeight: '0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               Enviar
@@ -252,14 +281,34 @@ function MessageList(props) {
                 )   
               }
             </Text>
-            <Button
-              iconName="removeFormat"
+            <Box
+              as='div'
+              styleSheet={{
+                borderRadius: '50%',
+                padding: '0 3px 0 0',
+                minWidth: '50px',
+                maxHeight: '45px',
+                fontSize: '15px',
+                marginBottom: '8px',
+                lineHeight: '0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: '5px',
+                backgroundColor: 'transparent',
+                cursor: 'pointer',
+                color: appConfig.theme.colors.primary[500],
+                hover: {
+                  backgroundColor: appConfig.theme.colors.neutrals[700],
+                }
+                
+              }}
               onClick={function() {
                 const novaLista = props.mensagens
                 novaLista.splice(index, 1)
                 props.mudarLista([...novaLista])
               }}
-            />
+            >x</Box>
           </Box>
         )
       })}
